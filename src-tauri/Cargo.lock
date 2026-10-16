@@ -2731,8 +2731,7 @@ dependencies = [
 [[package]]
 name = "isideload"
 version = "0.4.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "473bde4da71c72bcf5f1cf77acfffdf4b879b65ef989c19f8cb4c3e9ea758a76"
+source = "git+https://github.com/cb93ka/isideload?branch=sms-403#6e54355e0642120ce370c145dd5885815360eb49"
 dependencies = [
  "aes 0.9.3",
  "aes-gcm",
