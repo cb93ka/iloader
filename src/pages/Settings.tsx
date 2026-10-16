@@ -68,7 +68,11 @@ export const Settings = ({
   const { err } = useError();
   const { confirm } = useDialog();
 
-  const anisetteOptions = anisetteServers.map(([value, label]) => ({
+  const anisetteOptions = (
+    platform === "mac"
+      ? [["this-mac", "This Mac (no server)"], ...anisetteServers]
+      : anisetteServers
+  ).map(([value, label]) => ({
     value,
     label,
   }));

@@ -1,4 +1,7 @@
 use futures::FutureExt;
+
+/// The anisette setting that means "use this Mac's own anisette" instead of a server.
+const THIS_MAC_ANISETTE: &str = "this-mac";
 use isideload::{
     anisette::remote_v3::RemoteV3AnisetteProvider,
     auth::apple_account::{AppleAccount, TwoFactorCallbackParams, TwoFactorCallbackResponse},
@@ -189,21 +192,33 @@ async fn login(
         }
     };
 
-    let anisette_url = if !anisette_server.starts_with("http") {
-        format!("https://{}", anisette_server)
+    // "This Mac": anisette from macOS itself, which Apple trusts where it answers the remote servers' with 403 at 2FA.
+    let mut account = if cfg!(target_os = "macos") && anisette_server == THIS_MAC_ANISETTE {
+        #[cfg(target_os = "macos")]
+        {
+            AppleAccount::builder(&email.to_lowercase())
+                .anisette_provider(isideload::anisette::macos_local::MacLocalAnisetteProvider::new())
+                .login(password, Box::new(tfa_closure))
+                .await?
+        }
+        #[cfg(not(target_os = "macos"))]
+        unreachable!()
     } else {
-        anisette_server
+        let anisette_url = if !anisette_server.starts_with("http") {
+            format!("https://{}", anisette_server)
+        } else {
+            anisette_server
+        };
+        AppleAccount::builder(&email.to_lowercase())
+            .anisette_provider(
+                RemoteV3AnisetteProvider::default()?
+                    .set_serial_number("0".to_string())
+                    .set_storage(create_sideloading_storage(app)?)
+                    .set_url(&anisette_url),
+            )
+            .login(password, Box::new(tfa_closure))
+            .await?
     };
-
-    let mut account = AppleAccount::builder(&email.to_lowercase())
-        .anisette_provider(
-            RemoteV3AnisetteProvider::default()?
-                .set_serial_number("0".to_string())
-                .set_storage(create_sideloading_storage(app)?)
-                .set_url(&anisette_url),
-        )
-        .login(password, Box::new(tfa_closure))
-        .await?;
 
     debug!("Logged in");
 

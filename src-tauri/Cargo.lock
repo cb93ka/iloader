@@ -2731,7 +2731,7 @@ dependencies = [
 [[package]]
 name = "isideload"
 version = "0.4.6"
-source = "git+https://github.com/cb93ka/isideload?branch=sms-403#6e54355e0642120ce370c145dd5885815360eb49"
+source = "git+https://github.com/cb93ka/isideload?branch=mac-anisette#0994ceafd4e733c032c4fd9bf7e25ceb9bb3b84f"
 dependencies = [
  "aes 0.9.3",
  "aes-gcm",
@@ -2739,6 +2739,7 @@ dependencies = [
  "async-trait",
  "base64 0.22.1",
  "cbc 0.2.1",
+ "cc",
  "futures",
  "futures-util",
  "hex",
